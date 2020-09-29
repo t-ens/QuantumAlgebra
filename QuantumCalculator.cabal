@@ -1,0 +1,62 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 185109422f39a823d17f5606e663bd5a548fbb96a44dea6948bf912cfc861f27
+
+name:           QuantumCalculator
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/QuantumCalculator#readme>
+homepage:       https://github.com/githubuser/QuantumCalculator#readme
+bug-reports:    https://github.com/githubuser/QuantumCalculator/issues
+author:         Travis Ens
+maintainer:     ens.travis@gmail.com
+copyright:      2020 Travis Ens
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/QuantumCalculator
+
+library
+  exposed-modules:
+      FreeLie
+  other-modules:
+      Paths_QuantumCalculator
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable QuantumCalculator-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_QuantumCalculator
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuantumCalculator
+    , base >=4.7 && <5
+  default-language: Haskell2010
+
+test-suite QuantumCalculator-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_QuantumCalculator
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuantumCalculator
+    , base >=4.7 && <5
+  default-language: Haskell2010
