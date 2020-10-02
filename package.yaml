@@ -24,6 +24,7 @@ dependencies:
 
 library:
   source-dirs: src
+  exposed-modules: FreeLie
 
 executables:
   QuantumCalculator-exe:
