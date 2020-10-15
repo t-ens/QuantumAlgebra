@@ -4,28 +4,26 @@ import FreeLie
 
 instance Arbitrary LW where
   arbitrary = do
-    n <- choose (1::Int,3)
-    m <- choose (2::Int, 3)
+    n <- choose (1::Int,5)
+    m <- choose (2::Int, 4)
     let words = allLyndonWords n [1,2..m]
     index <- choose (0, (length words) - 1 )
     return (words!!index)
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (FreeVec a b) where
   arbitrary = do 
-    x <- arbitrary
-    y <- arbitrary
-    return (LC [(x,y)])
+    k <- choose (0::Int,5)
+    genLC <- sequence [ arbitrary | _ <- [1..k] ]
+    return $ LC genLC
 
-
---Vector spaces should form an abelian group under addition
 agAssocLaw :: (AbelianGroup a, Eq a) => a-> a-> a -> Bool
 agAssocLaw x y z = (x `agAdd` (y `agAdd` z)) == ((x `agAdd` y) `agAdd` z)
 
---agUnitLaw :: (AbelianGroup a, Eq a) => a -> Bool
---agUnitLaw x = and [(agId `agAdd` x) == x, (x `agAdd` agId) == x]
+agUnitLaw :: (AbelianGroup a, Eq a) => a -> Bool
+agUnitLaw x = and [(agId `agAdd` x) == x, (x `agAdd` agId) == x]
 
-agUnitLaw :: (FreeVec Rational LW) -> Bool
-agUnitLaw x = and [ simplify (agId `agAdd` x) == simplify x, simplify (x `agAdd` agId) == simplify x]
+--agUnitLaw :: (FreeVec Rational LW) -> Bool
+--agUnitLaw x = and [ simplify (agId `agAdd` x) == simplify x, simplify (x `agAdd` agId) == simplify x]
 
 agAbelianLaw :: (AbelianGroup a, Eq a) => a -> a -> Bool
 agAbelianLaw x y = (x `agAdd` y) == (y `agAdd` x)

@@ -40,7 +40,15 @@ instance Field Rational where
 
 --The free vector space with basis b over the field is a list of scalar
 --multiples of basis elements
-data FreeVec a b = LC [(a,b)] deriving (Eq, Show)
+data FreeVec a b = LC [(a,b)]
+
+instance (Field a, Eq a, Ord b) => Eq (FreeVec a b) where
+  (==) (LC x)  (LC y) = ((simplifyList x) == (simplifyList y))
+
+instance (Show a, Show b) => Show (FreeVec a b) where
+  show (LC []) = ""
+  show (LC [(x,y)]) = show x ++ "*" ++ show y
+  show (LC ((x,y):xs)) = show x ++ "*" ++ show y ++ "+" ++ show (LC xs)
 
 --sort by basis elements for testing equality
 basisSort :: Ord b => (a,b) -> (a,b) -> Ordering
@@ -81,8 +89,7 @@ newtype LW = LW {theWord :: [Int]} deriving (Eq,Ord)
 
 lyndonQ :: LW -> Bool
 lyndonQ  (LW []) = False
-lyndonQ LW w = and 
-
+lyndonQ (LW w) = foldr (\x -> (&&) ((LW w) < (LW x))) True [drop i w | i <- [1 .. (length w-1)]]
 
 allLyndonWords n alph = filter lyndonQ ( map LW (allWords n alph) )
   where
@@ -114,9 +121,8 @@ bracket (LC xs) (LC ys) = simplify.concatLC $
   map (\ ((a,v),(b,w)) -> ((a `fMult` b) `vScal` (lwAdjoint v w))) 
     [ (x,y) | x<-xs, y<-ys ]
       where concatLC :: [FreeVec Rational LW] -> FreeVec Rational LW
-            concatLC = foldr1 agAdd
-        
-
+            concatLC [] = LC [] 
+            concatLC w = foldr1 agAdd w
 
 lwAdjoint :: LW -> LW -> FreeVec Rational LW
 lwAdjoint w z = 
