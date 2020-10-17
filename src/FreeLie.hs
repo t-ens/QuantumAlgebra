@@ -11,7 +11,7 @@ class Field a where
   fAdd :: a -> a -> a
   fMult :: a -> a -> a
   fNeg :: a -> a
-  fInv :: a -> Maybe a --inversion is only partially defined 
+  fInv :: a -> a
   fAId :: a
   fMId :: a
 
@@ -33,8 +33,8 @@ instance Field Rational where
   fAdd a b = a+b
   fNeg a = (-1)*a
   fMult a b = a*b
-  fInv 0 = Nothing
-  fInv a = Just (1/a)
+  fInv 0 = 0       --Maybe use maybe instead?
+  fInv a = 1/a
   fAId = 0
   fMId = 1    
 
