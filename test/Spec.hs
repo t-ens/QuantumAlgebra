@@ -50,60 +50,53 @@ vsUnitLaw c x = (c `fMult` (fInv c) ) `vScal` x == x --Fix types so I can use fA
 --FIXME: Add lie algebra class and define these tests generally
 --Lie algebra bracket axioms
 
-lieAlgLinearOne :: Rational -> (FreeVec Rational LW) -> (FreeVec Rational LW)
-  -> (FreeVec Rational LW) -> Bool
+lieAlgLinearOne :: Rational -> DKS -> DKS -> DKS -> Bool
 lieAlgLinearOne a x y z = bracket ((a `vScal` x) `agAdd` y) z ==
   a `vScal` bracket x z `agAdd` bracket y z
 
-lieAlgLinearTwo :: Rational -> (FreeVec Rational LW) -> (FreeVec Rational LW)
-  -> (FreeVec Rational LW) -> Bool
+lieAlgLinearTwo :: Rational -> DKS -> DKS -> DKS -> Bool
 lieAlgLinearTwo a x y z = bracket z ((a `vScal` x) `agAdd` y)  ==
   a `vScal` bracket z x `agAdd` bracket z y
 
-lieAlgASymm :: (FreeVec Rational LW) -> (FreeVec Rational LW) -> Bool 
+lieAlgASymm :: DKS -> DKS -> Bool 
 lieAlgASymm x y = bracket x y == (fNeg (fMId::Rational)) `vScal` bracket y x 
 
-lieAlgJacobi :: (FreeVec Rational LW) -> (FreeVec Rational LW)
-  -> (FreeVec Rational LW) -> Bool
+lieAlgJacobi :: DKS -> DKS -> DKS -> Bool
 lieAlgJacobi x y z =
   bracket x (bracket y z) `agAdd` bracket y (bracket z x)
-    `agAdd` bracket z (bracket x y) == (agId::(FreeVec Rational LW))
+    `agAdd` bracket z (bracket x y) == agId
 
 main :: IO ()
 main = hspec $ do 
-  describe "FreeVec Rational LW is an abelian group under addition:" $ do
+  describe "DKS is an abelian group under addition:" $ do
 
     it "Addition is abelian" $ do
-      property $ (agAbelianLaw :: (FreeVec Rational LW) -> (FreeVec Rational LW) -> Bool)
+      property $ (agAbelianLaw :: DKS -> DKS -> Bool)
 
     it "Addition is associative" $ do
-      property $ (agAssocLaw :: (FreeVec Rational LW) -> (FreeVec Rational LW) 
-        -> (FreeVec Rational LW) -> Bool) 
+      property $ (agAssocLaw :: DKS -> DKS -> DKS -> Bool) 
 
     it "Unit laws hold for addition" $ do
-      property $ (agUnitLaw :: (FreeVec Rational LW) -> Bool) 
+      property $ (agUnitLaw :: DKS -> Bool) 
     
     it "Additive inverse laws hold" $ do
-      property $ (agInverseLaw :: (FreeVec Rational LW) -> Bool) 
+      property $ (agInverseLaw :: DKS -> Bool) 
 
-  describe "FreeVec Rational LW is a vector space:" $ do
+  describe "DKS is a vector space:" $ do
     
     it "Scalar multiplication distributes over group addition" $ do
-      property $ (vsGroupDistLaw :: Rational -> (FreeVec Rational LW) 
-        -> (FreeVec Rational LW) -> Bool)
+      property $ (vsGroupDistLaw :: Rational -> DKS -> DKS -> Bool)
 
     it "Scalar multiplication distributes over field addition" $ do
-      property $ (vsFieldDistLaw :: Rational -> Rational -> 
-        (FreeVec Rational LW) -> Bool)
+      property $ (vsFieldDistLaw :: Rational -> Rational -> DKS -> Bool)
 
     it "Scalar multiplication associates:" $ do
-      property $ (vsScalarAssoc :: Rational -> Rational -> (FreeVec Rational LW)
-        -> Bool)
+      property $ (vsScalarAssoc :: Rational -> Rational -> DKS -> Bool)
     
     it "Scalar multiplication unit law holds:" $ do
-      property $ (vsUnitLaw :: Rational -> (FreeVec Rational LW) -> Bool)
+      property $ (vsUnitLaw :: Rational -> DKS -> Bool)
 
-  describe "FreeVec Rational LW is a Lie algebra:" $ do
+  describe "DKS is a Lie algebra:" $ do
 
     it "The bracket is linear in the first argument:" $ do
       property $ lieAlgLinearOne
@@ -115,7 +108,6 @@ main = hspec $ do
       property $ lieAlgASymm
 
     it "The bracket satisfies the Jacobi Identity" $
-      property $ (lieAlgJacobi :: (FreeVec Rational LW) -> (FreeVec Rational LW)
-        -> (FreeVec Rational LW) -> Bool)
+      property $ (lieAlgJacobi :: DKS -> DKS -> DKS -> Bool)
     
 

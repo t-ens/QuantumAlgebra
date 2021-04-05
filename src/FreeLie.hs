@@ -1,11 +1,19 @@
-{-# LANGUAGE MultiParamTypeClasses #-} --Needed for field
-{-# Language FlexibleInstances #-}     --Needed to make Rational instances
+{-# LANGUAGE MultiParamTypeClasses #-} 
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE GADTs #-}
 
 module FreeLie where
 
 import Data.List
 
 --Basic mathematical structures
+
+class AbelianGroup a where
+  agAdd, (*+) :: a -> a -> a
+  x *+ y = agAdd x y
+  agInv :: a -> a
+  agId :: a
 
 class Field a where
   fAdd :: a -> a -> a
@@ -14,11 +22,6 @@ class Field a where
   fInv :: a -> a
   fAId :: a
   fMId :: a
-
-class AbelianGroup a where
-  agAdd :: a -> a -> a
-  agInv :: a -> a
-  agId :: a
 
 class (Field a, AbelianGroup b) => VectorSpace a b where
   vScal :: a -> b -> b
@@ -46,7 +49,7 @@ instance (Field a, Eq a, Ord b) => Eq (FreeVec a b) where
   (==) (LC x)  (LC y) = ((simplifyList x) == (simplifyList y))
 
 instance (Show a, Show b) => Show (FreeVec a b) where
-  show (LC []) = ""
+  show (LC []) = show "0"
   show (LC [(x,y)]) = show x ++ "*" ++ show y
   show (LC ((x,y):xs)) = show x ++ "*" ++ show y ++ "+" ++ show (LC xs)
 
@@ -79,8 +82,8 @@ instance (Field a, Eq a, Ord b) => AbelianGroup (FreeVec a b) where
   agInv (LC z)  =LC $ map (\(x,y)->(fNeg x,y)) z
   agId = LC []
 
-instance (Field a, Eq a, Ord b) => VectorSpace a (FreeVec a b) where
-  vScal f (LC v) = LC $  map (\(c,d) -> (f `fMult` c,d)) v 
+instance (Field a, Eq a, a ~ a', Ord b) => VectorSpace a (FreeVec a' b) where
+  vScal f (LC v) = LC . simplifyList $ map (\(c,d) -> (f `fMult` c,d)) v 
 
 -- Lyndon Words are a basis of the rational Free Lie algebra
 -- A Lyndon word is lexicographically smaller than all of its proper right
@@ -114,17 +117,18 @@ bracketForm x = "[" ++ (bracketForm a) ++ "," ++ (bracketForm b) ++ "]"
 
 instance Show LW where
   show = bracketForm
-  
 
-bracket :: (FreeVec Rational LW) -> (FreeVec Rational LW) -> (FreeVec Rational LW)
+type DKS = FreeVec Rational LW
+  
+bracket :: DKS -> DKS -> DKS 
 bracket (LC xs) (LC ys) = simplify.concatLC $ 
   map (\ ((a,v),(b,w)) -> ((a `fMult` b) `vScal` (lwAdjoint v w))) 
     [ (x,y) | x<-xs, y<-ys ]
-      where concatLC :: [FreeVec Rational LW] -> FreeVec Rational LW
+      where concatLC :: [DKS] -> DKS 
             concatLC [] = LC [] 
             concatLC w = foldr1 agAdd w
 
-lwAdjoint :: LW -> LW -> FreeVec Rational LW
+lwAdjoint :: LW -> LW -> DKS
 lwAdjoint w z = 
   if w == z 
     then LC [(0,w)]
